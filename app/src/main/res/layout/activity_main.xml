@@ -7,5 +7,6 @@
     android:background="#000000"
     tools:context=".Main">
 >
-    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="Launch is nice"></TextView>
+    <TextView android:id="@+id/text_dump" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="Yay for yay!"></TextView>
+    <GridView android:numColumns="6" android:id="@+id/grid" android:layout_height="fill_parent" android:layout_width="fill_parent" />
 </LinearLayout>
