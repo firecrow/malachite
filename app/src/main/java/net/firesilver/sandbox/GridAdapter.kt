@@ -12,25 +12,14 @@ import android.view.ViewGroup
 import android.content.Context
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.ScaleDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.Color
-import android.graphics.Color.*
 
 class GridAdapter(
     val ctx: MainActivity,
-    var apps: ArrayList<ApplicationInfo>,
+    var apps: ArrayList<App>,
 ) :
-    ArrayAdapter<ApplicationInfo>(ctx, R.layout.cell, apps) {
+    ArrayAdapter<App>(ctx, R.layout.cell, apps) {
 
-    fun asAdaptive(icon: Drawable): AdaptiveIconDrawable{
-        var defaultBackground = ColorDrawable(Color.WHITE)
-
-        if(icon !is AdaptiveIconDrawable){
-            return AdaptiveIconDrawable(defaultBackground, icon)
-        }
-        return icon
-    }
 
 
     val inflater: LayoutInflater =
@@ -40,7 +29,7 @@ class GridAdapter(
         return apps.count()
     }
 
-    override fun getItem(idx: Int): ApplicationInfo {
+    override fun getItem(idx: Int): App {
         return apps.get(idx)
     }
 
@@ -51,11 +40,9 @@ class GridAdapter(
         val row = inflater.inflate(R.layout.cell, null)
         row.layoutParams = LinearLayout.LayoutParams(GridView.AUTO_FIT, 200)
 
-        val pm = ctx.getPackageManager()
         var icon = row.findViewById(R.id.icon_fg) as ImageView
-        var iconDrawable = asAdaptive(pm.getApplicationIcon(item))
         
-        icon.setImageDrawable(iconDrawable.foreground)
+        icon.setImageDrawable(item.icon)
 
         return row
     }
