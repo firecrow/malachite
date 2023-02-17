@@ -34,6 +34,17 @@ data class App (
     val icon: Drawable,
 )
 
+val fixedPositionMap = mutableMapOf(
+    "net.firesilver.sandbox" to 0,
+    "com.google.android.deskclock" to 1,
+    "com.android.chrome" to 2,
+    "com.google.android.apps.messaging" to 3,
+    "com.google.android.calendar" to 4,
+    "com.lastpass.lpandroid" to 5,
+    "com.lastpass.lpandroid" to 6,
+    "com.google.android.gm" to 7,
+)
+
 class MainActivity : AppCompatActivity() {
     private lateinit var textDump: TextView
 
@@ -48,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     fun generateSystemList(): List<App>{
         val pm = this.getPackageManager()
+
         return pm.getInstalledApplications(PackageManager.GET_META_DATA).filter { app -> 
             pm.getLaunchIntentForPackage(app.packageName) != null
         }.map { app ->
@@ -58,7 +70,32 @@ class MainActivity : AppCompatActivity() {
            }
 
            App(pm.getApplicationLabel(app).toString(), app, iconImage)
-        }.sortedBy { it.name }
+        }.sortedWith(object : Comparator <App> {
+            override fun compare (a: App, b: App) : Int {
+                val positionA = fixedPositionMap.get(a.info.packageName)
+                val positionB = fixedPositionMap.get(b.info.packageName)
+                if(positionA != null && positionB != null){
+                    return positionA - positionB 
+                }
+                if(positionA != null && positionB == null){
+                    return -1 
+                }
+                if(positionA == null && positionB != null){
+                    return 1 
+                }
+                return a.name.compareTo(b.name)
+            }
+        })
+    }
+
+    fun onClickInterceptor(app: App): Boolean {
+        Log.e("fcrow", "clicked on "+app.info.packageName)
+        if(app.info.packageName == "net.firesilver.sandbox"){
+            Toast.makeText(this, "Hi its the master app", Toast.LENGTH_LONG).show()
+
+            return true;
+        }
+        return false;
     }
 
     fun fillGrid(
@@ -73,8 +110,6 @@ class MainActivity : AppCompatActivity() {
         val inflater: LayoutInflater =
             this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        Log.e("fcrow", "filling grid")
-
         fun makeRow(): LinearLayout {
             val row = LinearLayout(this)
             row.layoutParams = LinearLayout.LayoutParams(
@@ -86,13 +121,10 @@ class MainActivity : AppCompatActivity() {
         var row = makeRow();
 
         for(item in apps){
-            Log.e("fcrow", "filling grid "+item.name)
-
             val cell = inflater.inflate(R.layout.cell, null)
             cell.layoutParams = LinearLayout.LayoutParams(cellWidth, cellHeight)
 
             var icon = cell.findViewById(R.id.icon_fg) as ImageView
-            
             icon.setImageDrawable(item.icon)
 
             var matrix = ColorMatrix()
@@ -131,8 +163,10 @@ class MainActivity : AppCompatActivity() {
 
         Log.e("fcrow","about to fill grid")
         fillGrid(grid, ArrayList<App>(data), metrics.widthPixels, cellHeight, cellWidth, { app ->
-            this.getPackageManager().getLaunchIntentForPackage(app.info.packageName)
-                ?.let { this.startActivity(it) }
+            if(!onClickInterceptor(app)){
+                this.getPackageManager().getLaunchIntentForPackage(app.info.packageName)
+                   ?.let { this.startActivity(it) }
+            }
         })
     }
 }
