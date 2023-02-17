@@ -1,20 +1,30 @@
 package net.firesilver.sandbox
 
-import android.os.Bundle
-import android.widget.Toast
-import android.widget.TextView
-import android.widget.GridView
-import androidx.appcompat.app.AppCompatActivity
-import android.content.pm.PackageManager
-import android.widget.AbsListView
+import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.BitmapDrawable
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.Color
 import android.graphics.Color.*
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AbsListView
+import android.widget.ArrayAdapter
+import android.widget.ScrollView
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import android.util.DisplayMetrics 
 
 data class App (
     val name: String,
@@ -49,19 +59,54 @@ class MainActivity : AppCompatActivity() {
         }.sortedBy { it.name }
     }
 
+    fun fillGrid(
+        contentView: ViewGroup,
+        apps: ArrayList<App>,
+        cellHeight: Int,
+        cellWidth: Int, 
+        onClick: (App) -> Unit,
+    ) {
+
+        val inflater: LayoutInflater =
+            this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        for(item in apps){
+
+            val cell = inflater.inflate(R.layout.cell, null)
+            cell.layoutParams = LinearLayout.LayoutParams(cellHeight, cellWidth)
+
+            var icon = cell.findViewById(R.id.icon_fg) as ImageView
+            
+            icon.setImageDrawable(item.icon)
+
+            var matrix = ColorMatrix()
+            matrix.setSaturation(0.0f)
+            icon.setColorFilter(ColorMatrixColorFilter(matrix))
+
+            cell.setOnClickListener(
+                View.OnClickListener { view -> onClick(item) }
+            )
+
+            contentView.addView(cell)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val data = generateSystemList()
 
-        val grid = findViewById<GridView>(R.id.grid) as GridView
-        val adapter = GridAdapter(this, ArrayList<App>(data))
-        grid.setAdapter(adapter)
+        val grid = findViewById<ScrollView>(R.id.grid) as ScrollView 
 
-        grid.setOnItemClickListener { parent, view, idx, id ->
-            val app: App = adapter.getItem(idx)
+        val metrics = DisplayMetrics();
+        return getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        val cellHeight = metrics.heightPixels / 10;
+        val cellWidth = metrics.widthPixels / 6;
+
+        fillGrid(grid, ArrayList<App>(data), cellHeight, cellWidth, { app ->
             this.getPackageManager().getLaunchIntentForPackage(app.info.packageName)
                 ?.let { this.startActivity(it) }
-        }
+        })
     }
 }

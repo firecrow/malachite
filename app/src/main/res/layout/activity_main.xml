@@ -7,5 +7,5 @@
     android:background="#000000"
     tools:context=".Main">
 >
-    <GridView android:numColumns="6" android:id="@+id/grid" android:layout_height="fill_parent" android:layout_width="fill_parent" />
+    <ScrollView android:id="@+id/grid" android:layout_height="fill_parent" android:layout_width="fill_parent" />
 </LinearLayout>
