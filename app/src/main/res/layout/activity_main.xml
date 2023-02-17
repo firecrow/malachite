@@ -7,5 +7,7 @@
     android:background="#000000"
     tools:context=".Main">
 >
-    <ScrollView android:id="@+id/grid" android:layout_height="fill_parent" android:layout_width="fill_parent" />
+    <ScrollView android:layout_height="fill_parent" android:layout_width="fill_parent">
+        <LinearLayout android:orientation="vertical" android:id="@+id/grid" android:layout_height="fill_parent" android:layout_width="fill_parent" />
+    </ScrollView>
 </LinearLayout>
