@@ -135,12 +135,14 @@ class MainActivity : AppCompatActivity() {
                 View.OnClickListener { view -> onClick(item) }
             )
 
-            pxPosition += cellWidth;
-            if(pxPosition > totalWidth){
+            if(pxPosition + cellWidth > totalWidth){
                 contentView.addView(row)
                 row = makeRow()
                 pxPosition = 0
             }
+            pxPosition += cellWidth
+
+            Log.e("fcrow", "position is ("+pxPosition+") "+ pxPosition / cellWidth +" for: " + item.name);
             row.addView(cell)
         }
         contentView.addView(row)
