@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.AbsListView
 import android.widget.ArrayAdapter
 import android.widget.ScrollView
@@ -63,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     fun fillGrid(
         contentView: ViewGroup,
         apps: ArrayList<App>,
+        totalWidth: Int,
         cellHeight: Int,
         cellWidth: Int, 
         onClick: (App) -> Unit,
@@ -71,38 +73,45 @@ class MainActivity : AppCompatActivity() {
         val inflater: LayoutInflater =
             this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        Log.e("fcrow","filling grid")
+        Log.e("fcrow", "filling grid")
+
+        fun makeRow(): LinearLayout {
+            val row = LinearLayout(this)
+            row.layoutParams = LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            return row
+        }
+
+        var pxPosition = 0;
+        var row = makeRow();
 
         for(item in apps){
-            Log.e("fcrow","filling grid "+item.name)
+            Log.e("fcrow", "filling grid "+item.name)
 
             val cell = inflater.inflate(R.layout.cell, null)
-            cell.layoutParams = LinearLayout.LayoutParams(cellHeight, cellWidth)
-            Log.e("fcrow","filling grid 2 "+item.name)
+            cell.layoutParams = LinearLayout.LayoutParams(cellWidth, cellHeight)
 
             var icon = cell.findViewById(R.id.icon_fg) as ImageView
-            Log.e("fcrow","filling grid 3 "+item.name)
             
             icon.setImageDrawable(item.icon)
-            Log.e("fcrow","filling grid 4 "+item.name)
 
             var matrix = ColorMatrix()
             matrix.setSaturation(0.0f)
             icon.setColorFilter(ColorMatrixColorFilter(matrix))
-            Log.e("fcrow","filling grid 5 "+item.name)
 
             cell.setOnClickListener(
                 View.OnClickListener { view -> onClick(item) }
             )
 
-            Log.e("fcrow","filling grid 6 "+item.name)
-            try {
-                contentView.addView(cell)
-            }catch(e: Exception){
-                Log.e("fcrow","filling grid 7 "+e.toString())
+            pxPosition += cellWidth;
+            if(pxPosition > totalWidth){
+                contentView.addView(row)
+                row = makeRow()
+                pxPosition = 0
             }
-            Log.e("fcrow","filling grid 7 "+item.name)
+            row.addView(cell)
         }
+        contentView.addView(row)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         val cellWidth = metrics.widthPixels / 6;
 
         Log.e("fcrow","about to fill grid")
-        fillGrid(grid, ArrayList<App>(data), cellHeight, cellWidth, { app ->
+        fillGrid(grid, ArrayList<App>(data), metrics.widthPixels, cellHeight, cellWidth, { app ->
             this.getPackageManager().getLaunchIntentForPackage(app.info.packageName)
                 ?.let { this.startActivity(it) }
         })
