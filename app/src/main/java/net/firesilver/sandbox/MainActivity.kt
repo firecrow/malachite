@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             }
             pxPosition += cellWidth
 
-            Log.e("fcrow", "position is ("+pxPosition+") "+ pxPosition / cellWidth +" for: " + item.name);
+            //Log.e("fcrow", "position is ("+pxPosition+") "+ pxPosition / cellWidth +" for: " + item.name);
             row.addView(cell)
         }
         contentView.addView(row)
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.e("fcrow","hi there this is a test")
+        Log.e("fcrow","frontend thread starting")
 
         val data = generateSystemList()
 
@@ -163,7 +163,6 @@ class MainActivity : AppCompatActivity() {
         val cellHeight = metrics.heightPixels / 10;
         val cellWidth = metrics.widthPixels / 6;
 
-        Log.e("fcrow","about to fill grid")
         fillGrid(grid, ArrayList<App>(data), metrics.widthPixels, cellHeight, cellWidth, { app ->
             if(!onClickInterceptor(app)){
                 this.getPackageManager().getLaunchIntentForPackage(app.info.packageName)
