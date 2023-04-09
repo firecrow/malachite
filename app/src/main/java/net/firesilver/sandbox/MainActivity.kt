@@ -305,6 +305,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.e("fcrow","frontend thread starting")
 
-        updateAppList(ALL)
+        updateAppList(STARRED)
     }
 }
