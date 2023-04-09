@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
         var defaultBackground = ColorDrawable(Color.WHITE)
 
         if(icon !is AdaptiveIconDrawable){
+            Log.i("fcrow", "Converting...")
             return AdaptiveIconDrawable(defaultBackground, icon)
         }
         return icon
@@ -148,8 +149,10 @@ class MainActivity : AppCompatActivity() {
         val tiles = pm.getInstalledApplications(PackageManager.GET_META_DATA).filter { app ->
             pm.getLaunchIntentForPackage(app.packageName) != null
         }.map { app ->
+            Log.i("fcrow", "gathering: "+app.packageName)
             var foreground = asAdaptive(pm.getApplicationIcon(app)).foreground
             var iconImage = foreground
+            Log.i("fcrow", "iconimage: "+iconImage.toString())
             if (foreground is BitmapDrawable) {
                 iconImage = BitmapDrawable(
                     Bitmap.createScaledBitmap(
