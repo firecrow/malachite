@@ -46,19 +46,11 @@ data class App (
 fun getTile(behaviour: Int): App {
     Log.e("fcrow","getting tile"+behaviour)
 
-    val gradientTopDown = GradientDrawable(
-        GradientDrawable.Orientation.TOP_BOTTOM,
-        intArrayOf(
-            0XFFFFFFFF.toInt(),
-            0X999999.toInt()
-        )
-    )
-
     if(behaviour == EDITVIEW_BEHAVIOUR) {
         return App(
             "net.firesilver.custom.editview",
             null,
-            gradientTopDown,
+            ColorDrawable(Color.parseColor("#00000000")),
             EDITVIEW_BEHAVIOUR
         )
     }
@@ -66,7 +58,7 @@ fun getTile(behaviour: Int): App {
         return App(
             "net.firesilver.custom.appsview",
             null,
-            gradientTopDown,
+            ColorDrawable(Color.parseColor("#00000000")),
             APPSVIEW_BEHAVIOUR
         )
     }
@@ -82,7 +74,7 @@ fun getTile(behaviour: Int): App {
         return App(
             "net.firesilve.custom.all",
             null,
-            ColorDrawable(0xffffff),
+            ColorDrawable(Color.parseColor("#00FF44")),
             ALL_BEHAVIOUR
         )
     }
@@ -90,7 +82,7 @@ fun getTile(behaviour: Int): App {
         return App(
             "net.firesilve.custom.starred",
             null,
-            ColorDrawable(0x009900),
+            ColorDrawable(Color.parseColor("#FFFFFF")),
             STARRED_BEHAVIOUR
         )
     }
