@@ -132,7 +132,6 @@ class Service() : NotificationListenerService() {
         val extras = sbn.notification.extras
         val bundle = Bundle();
         for(k in extras.keySet()) {
-            Log.i("fcrow", "found " + k)
             val fieldType = fieldWhitelist[k]
             if (fieldType == BUNDLE_TYPE_STRING) {
                 bundle.putString(k, extras.getString(k))
@@ -159,8 +158,6 @@ class Service() : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.i("fcrow","removed "+sbn.getPackageName()+": "+sbn.getNotification().tickerText);
-
         val intent = Intent(EXTRA_NOTIFICATION_INTENT)
         intent.putExtra("package_name", sbn.packageName)
         intent.putExtra("type", "removed");
