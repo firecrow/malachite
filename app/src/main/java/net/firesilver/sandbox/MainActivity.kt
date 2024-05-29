@@ -36,6 +36,11 @@ val STARRED_BEHAVIOUR = 3
 val EDITVIEW_BEHAVIOUR = 4
 val NOOP_BEHAVIOUR = 5
 
+val COLOR_ADJ_BRIGHT = 6
+val COLOR_ADJ_MUTED = 7
+
+val COLOR_BG2 = "#FF222222"
+
 data class App (
     val name: String,
     val info: ApplicationInfo?,
@@ -44,7 +49,6 @@ data class App (
 )
 
 fun getTile(behaviour: Int): App {
-    Log.e("fcrow","getting tile"+behaviour)
 
     if(behaviour == EDITVIEW_BEHAVIOUR) {
         return App(
@@ -86,6 +90,7 @@ fun getTile(behaviour: Int): App {
             STARRED_BEHAVIOUR
         )
     }
+
     return App(
         "default",
         null,
@@ -96,38 +101,53 @@ fun getTile(behaviour: Int): App {
 
 val fixedPositionMap = mutableMapOf(
     "net.firesilver.sandbox" to 0,
-    "com.google.android.deskclock" to 1,
+    "com.android.settings" to 1,
     "com.android.chrome" to 2,
     "com.google.android.apps.messaging" to 3,
     "com.google.android.calendar" to 4,
-    "com.lastpass.lpandroid" to 5,
-    "com.google.android.gm" to 7,
-    "com.whatsapp" to 9,
-    "com.google.android.apps.maps" to 10,
-    "com.google.android.apps.photos" to 11,
-    "com.fsck.k9" to 12,
-    "uk.co.hsbc.hsbcukmobilebanking" to 13,
-    "com.linkedin.android" to 14,
-    "com.android.settings" to 15,
-    "com.google.android.apps.tasks" to 16,
-    "com.accuweather.android" to 17,
-    "com.google.android.keep" to 18,
-    "notion.id" to 19,
-    "com.atlassian.android.jira.core" to 20,
-    "com.sec.android.app.camera" to 21,
-    "com.transferwise.android" to 22,
-    "com.x8bit.bitwarden" to 23,
-    "com.google.android.apps.dynamite" to 24,
-    "app.fedilab.android" to 25,
-    "com.samsung.android.dialer" to 26,
-    "com.extreamsd.usbaudioplayerpro" to 27,
-    "com.android.vending" to 28,
-    "com.southwesttrains.journeyplanner" to 29,
-    "com.amazon.mShop.android.shopping" to 30,
-    "com.autocab.taxibooker.aquacars.portsmouth" to 31,
-    "com.deliveroo.orderapp" to 32,
-    "com.google.android.apps.authenticator2" to 33,
+    "com.google.android.gm" to 5,
+    "com.google.android.apps.maps" to 0,
+    "com.google.android.apps.photos" to 7,
+    "com.linkedin.android" to 8,
+    "com.google.android.apps.tasks" to 9,
+    "com.sec.android.app.camera" to 10,
+    "com.transferwise.android" to 11,
+    "com.x8bit.bitwarden" to 12,
+    "com.samsung.android.dialer" to 13,
+    "com.extreamsd.usbaudioplayerpro" to 14,
+    "com.google.android.apps.authenticator2" to 15,
+    "com.samsung.android.aremojieditor" to -1,
+    "com.samsung.android.arzone" to -1,
+    "com.samsung.accessibility" to -1,
+    "com.samsung.android.bixby.agent" to -1,
+    "com.samsung.android.app.tips" to -1,
+    "com.samsung.android.app.taskedge" to -1,
+    "com.android.traceur" to -1,
+    "com.sec.android.easyMover" to -1,
+    "com.sec.location.nfwlocationprivacy" to -1,
+    "com.samsung.android.tvplus" to -1,
+    "com.samsung.android.samsungpass" to -1,
+    "com.samsung.android.app.spage" to -1,
+    "com.sec.android.app.sbrowser" to -1,
+    "com.samsung.android.privateshare" to -1,
+    "com.samsung.android.messaging" to -1,
+    "com.verizon.messaging.vzmsgs" to -1,
+    "com.google.audio.hearing.visualization.accessibility.scribe" to -1,
+    "com.microsoft.appmanager" to -1,
+    "com.google.android.googlequicksearchbox" to -1,
+    "com.samsung.android.game.gamehome" to -1,
+    "com.sec.android.gallery3d" to -1,
+    "com.sec.android.app.samsungapps" to -1,
+    "com.samsung.android.gru" to -1,
+    "com.samsung.android.app.galaxyfinder" to -1,
+    "com.samsung.android.lool" to -1,
+    "com.sec.android.app.clockpackage" to -1,
+    "com.vcast.mediamanager" to -1,
+    "com.vzw.ecid" to -1,
+)
 
+val colorAdjMap = mutableMapOf(
+    "com.transferwise.android" to COLOR_ADJ_BRIGHT,
 )
 
 class MainActivity : AppCompatActivity() {
@@ -137,7 +157,6 @@ class MainActivity : AppCompatActivity() {
         var defaultBackground = ColorDrawable(Color.WHITE)
 
         if(icon !is AdaptiveIconDrawable){
-            Log.i("fcrow", "Converting...")
             return AdaptiveIconDrawable(defaultBackground, icon)
         }
         return icon
@@ -149,10 +168,8 @@ class MainActivity : AppCompatActivity() {
         val tiles = pm.getInstalledApplications(PackageManager.GET_META_DATA).filter { app ->
             pm.getLaunchIntentForPackage(app.packageName) != null
         }.map { app ->
-            Log.i("fcrow", "gathering: "+app.packageName)
             var foreground = asAdaptive(pm.getApplicationIcon(app)).foreground
             var iconImage = foreground
-            Log.i("fcrow", "iconimage: "+iconImage.toString())
             if (foreground is BitmapDrawable) {
                 iconImage = BitmapDrawable(
                     Bitmap.createScaledBitmap(
@@ -163,10 +180,10 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
-            Log.i("fcrow", "package: ${app.packageName}")
             App(pm.getApplicationLabel(app).toString(), app, iconImage, null)
         }.filter { a ->
-            !filtered || fixedPositionMap.get(a.info?.packageName) != null
+            val idx = fixedPositionMap.get(a.info?.packageName)
+            (!filtered || idx != null) && idx != -1
         }.sortedWith(object : Comparator <App> {
             override fun compare (a: App, b: App) : Int {
                 if(a.info == null){
@@ -186,17 +203,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 return a.name.compareTo(b.name)
             }
-
-
         })
+
         val mtiles = tiles.toMutableList()
         return listOf(getTile(EDITVIEW_BEHAVIOUR)) + mtiles
     }
 
     fun onClickInterceptor(app: App): Boolean {
-        Log.e("fcrow", "clicked on "+app.name+" ("+app.info?.packageName+")")
         if(app.info == null){
-            Log.e("fcrow", "intercepted: "+app.behaviourIdx)
             if (app.behaviourIdx == EDITVIEW_BEHAVIOUR) {
                 updateAppList(EDIT)
             }else if (app.behaviourIdx == APPSVIEW_BEHAVIOUR) {
@@ -222,7 +236,6 @@ class MainActivity : AppCompatActivity() {
         cellWidth: Int, 
         onClick: (App) -> Unit,
     ) {
-        Log.e("fcrow", "filling grid with "+apps.size+" items");
         contentView.removeAllViews()
 
         val inflater: LayoutInflater =
@@ -238,6 +251,8 @@ class MainActivity : AppCompatActivity() {
         var pxPosition = 0;
         var row = makeRow();
 
+        var i = 0
+        var r = 0
         for(item in apps){
             val cell = inflater.inflate(R.layout.cell, null)
             cell.layoutParams = LinearLayout.LayoutParams(cellWidth, cellHeight)
@@ -245,9 +260,27 @@ class MainActivity : AppCompatActivity() {
             var icon = cell.findViewById(R.id.icon_fg) as ImageView
             icon.setImageDrawable(item.icon)
 
-            var matrix = ColorMatrix()
-            matrix.setSaturation(0.0f)
-            icon.setColorFilter(ColorMatrixColorFilter(matrix))
+            Log.d("fcrow", "fcrow " + item.info?.packageName)
+
+            val colorAdj = colorAdjMap.get(item.info?.packageName)
+
+            if(colorAdj == COLOR_ADJ_MUTED) {
+                 var matrix = ColorMatrix()
+                 matrix.setSaturation(0.0f)
+                 icon.setColorFilter(ColorMatrixColorFilter(matrix))
+            }
+
+            if(colorAdj == COLOR_ADJ_BRIGHT) {
+                val matrix = ColorMatrix(
+                    floatArrayOf(
+                        1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 1.0f, 0.0f, 0.0f, 165.0f,
+                        0.0f, 0.0f, 1.0f, 0.0f, 100.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f, 0.0f
+                    )
+                )
+                icon.setColorFilter(ColorMatrixColorFilter(matrix))
+            }
 
             cell.setOnClickListener(
                 View.OnClickListener { view -> onClick(item) }
@@ -256,18 +289,26 @@ class MainActivity : AppCompatActivity() {
             if(pxPosition + cellWidth > totalWidth){
                 contentView.addView(row)
                 row = makeRow()
+                r++
                 pxPosition = 0
             }
             pxPosition += cellWidth
 
-            //Log.e("fcrow", "position is ("+pxPosition+") "+ pxPosition / cellWidth +" for: " + item.name);
+            /*
+            i++
+            if((i + r).mod(2) == 0) {
+                val clr = ColorDrawable(Color.parseColor(COLOR_BG2))
+                cell.background = clr
+            }
+            */
+
             row.addView(cell)
         }
+
         contentView.addView(row)
     }
 
     fun generateEditList(): List<App> {
-        Log.e("fcrow","generating edit list")
         val tiles = mutableListOf<App>()
         tiles.add(getTile(APPSVIEW_BEHAVIOUR))
         tiles.add(getTile(REFRESH_BEHAVIOUR))
@@ -306,8 +347,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.e("fcrow","frontend thread starting")
 
-        updateAppList(STARRED)
+        updateAppList(ALL)
     }
 }
