@@ -49,6 +49,7 @@ data class App (
 )
 
 fun getTile(behaviour: Int): App {
+    // These are tile `types` which adjust how each tile behaves or is presented
 
     if(behaviour == EDITVIEW_BEHAVIOUR) {
         return App(
@@ -99,6 +100,8 @@ fun getTile(behaviour: Int): App {
     )
 }
 
+// This is a hard-coded (for now) list of icons to place ahead of the native
+// alphabetical order for quick access
 val fixedPositionMap = mutableMapOf(
     "net.firesilver.sandbox" to 0,
     "com.android.settings" to 1,
@@ -146,10 +149,13 @@ val fixedPositionMap = mutableMapOf(
     "com.vzw.ecid" to -1,
 )
 
+// This forces a color-matrix adjustment for certain apps that look better that way
 val colorAdjMap = mutableMapOf(
     "com.transferwise.android" to COLOR_ADJ_BRIGHT,
 )
 
+// TODO: for simplicity this behavior is in the main activity, which will
+// expand into several seperate components as the project expands
 class MainActivity : AppCompatActivity() {
     private lateinit var textDump: TextView
 
@@ -163,6 +169,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun generateSystemList(filtered: Boolean): List<App>{
+        // This sets up the list of apps to populate for the homescreen.
+        // Including blowing out the backgrounds by modifying the AdaptiveIcon
+        // object recieved for each app
         val pm = this.getPackageManager()
 
         val tiles = pm.getInstalledApplications(PackageManager.GET_META_DATA).filter { app ->
@@ -236,6 +245,8 @@ class MainActivity : AppCompatActivity() {
         cellWidth: Int, 
         onClick: (App) -> Unit,
     ) {
+        // This lays out the grid and populates the items
+
         contentView.removeAllViews()
 
         val inflater: LayoutInflater =
@@ -309,6 +320,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun generateEditList(): List<App> {
+        // This populates the screen with a set of actions such as refresh, or
+        // abbreviate
+
         val tiles = mutableListOf<App>()
         tiles.add(getTile(APPSVIEW_BEHAVIOUR))
         tiles.add(getTile(REFRESH_BEHAVIOUR))
@@ -318,6 +332,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateAppList(state: Int) {
+        // This populates the screen with a subset of all available apps
+
         var data: List<App> = mutableListOf()
         if(state == ALL) {
             data = generateSystemList(false)
