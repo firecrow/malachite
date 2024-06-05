@@ -19,7 +19,8 @@ Malachite is very minimal, implementing it's own layout engine for simplicity an
 ## Notable Functions of the MainActivity class
 
 
-    ```kotlin    
+```kotlin    
+
 
     fun getTile(behaviour: Int): App {
         // These are tile `types` which adjust how each tile behaves or is presented
@@ -57,4 +58,5 @@ Malachite is very minimal, implementing it's own layout engine for simplicity an
             // This populates the screen with a subset of all available apps
         }
     }
-    ```
+
+```
