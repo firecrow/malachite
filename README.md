@@ -46,6 +46,13 @@ Malachite is very minimal, implementing it's own layout engine for simplicity an
         }
 
         fun fillGrid(
+            contentView: ViewGroup,
+            apps: ArrayList<App>,
+            totalWidth: Int,
+            cellHeight: Int,
+            cellWidth: Int, 
+            onClick: (App) -> Unit,
+        ) {
             // This lays out the grid and populates the items
         }
 
