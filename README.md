@@ -1,6 +1,6 @@
 # Malachite
 
-Malachite is a home-screen launcher for android featuring minimal icons. It is the super-seeding project for [Windmill](https://github.com/firecrow/windmill) which was a more fully featured combination of productivity features.
+Malachite is a home-screen launcher for android featuring minimal icons and a clean undistracting view.
 
 ![Screenshot](/docs/screenshot.jpg)
 
